@@ -10,3 +10,129 @@ func OnGroupMsg(subType, msgID int32, fromGroup, fromQQ int64, fromAnonymous, ms
 	}
 	return 0
 }
+
+package main
+
+import (
+	"github.com/Tnze/CoolQ-Golang-SDK/cqp"
+	"strings"
+	"log"
+	"os"
+	"bufio"
+	"fmt"
+)
+
+//go:generate cqcfg -c .
+// cqp: 名称:教学助手机器人
+// cqp: 版本: 1.0.4:5
+// cqp: 作者: zyj
+// cqp: 简介: ddl提醒机器
+
+var (
+	newFile *os.File
+	err     error
+)
+
+func main() {
+	newFile, err = os.Create("D:/test.txt")
+	if err!=nil {
+		log.Fatal(err)
+	}
+	log.Println(newFile)
+	newFile.Close()
+}
+
+var groups []int64
+var ddltime []int64
+var marks []int64
+var events []string
+
+func init() {
+	cqp.AppID = "bot.ddl.helpers"
+	cqp.GroupMsg = OnGroupMsg
+	cqp.PrivateMsg= onPrivateMsg
+	groups=append(groups,942315244)
+	groups=append(groups,829856110)
+}
+
+func querys() {
+	file,err:=os.Open("D:/test.txt")
+	if err!=nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	reader:= bufio.NewReader(file)
+	i=0
+	for {
+		i=i+1
+		str,err:=reader.ReadString('\n')
+		if err!=nil {
+			return
+		}
+		cqp.SendPrivateMsg(fromQQ,"%d %s\n",i,str)
+	}
+
+}
+
+func onPrivateMsg(subType, msgID int32, fromQQ int64, msg string, font int32) int32 {
+	if strings.Contains(msg,"添加") {
+		cqp.SendPrivateMsg(fromQQ,"请按以下格式输入：2020-01-01,20:00:00,name 其中标点为英文格式")
+		return 0
+	}
+
+	if strings.Contains(msg,"2020") {
+		fileName:= "D:/test"
+		file, err:=os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0755)
+		if err!= nil {
+			fmt.Println("error", err)
+			os.Exit(1)
+		}
+		defer file.Close()
+		file.Seek(0,2)
+		file.WriteString(msg)
+		return 0
+	}
+
+	if strings.Contains(msg,"删除") {
+		querys()
+		cqp.SendPrivateMsg(fromQQ,"请输入*+任务编号")
+		return 0
+	}
+
+	if strings.Contains(msg,"*+") {
+		n=msg[2]-'0'
+		file,err:=os.Open("D:/test.txt")
+		if err!=nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		reader:= bufio.NewReader(file)
+		i=0
+		for {
+			i=i+1
+			str,err:=reader.ReadString('\n')
+			if err!=nil {
+				return
+			}
+			if i==n {
+				str=""
+			}
+		}
+		return 0
+	}
+
+	if strings.Contains(msg,"查询") {
+		querys()
+		return 0
+	}
+
+	return 0
+}
+
+func OnGroupMsg(subType, msgID int32, fromGroup, fromQQ int64, fromAnonymous, msg string, font int32)int32 {
+	if strings.Contains(msg,"晚安") {
+		cqp.SendGroupMsg(fromGroup,"good night")
+		return 0
+	}
+	return 0
+}
