@@ -1,0 +1,32 @@
+{
+	"ret": 1,
+	"apiver": 9,
+	"appid": "bot.ddl.helpers",
+	"name": "bot",
+	"version": "1.0.4",
+	"version_id": 5,
+	"author": "zyj",
+	"description": "bot",
+	"event": [
+		{
+			"name": "群消息",
+			"function": "EVENT_ON_GROUP_MSG",
+			"type": 2,
+			"priority": 20000,
+			"id": 2
+		},
+		{
+			"name": "私聊消息",
+			"function": "EVENT_ON_PRIVATE_MSG",
+			"type": 21,
+			"priority": 20000,
+			"id": 1
+		}
+	],
+	"auth": [
+		106,
+		101
+	],
+	"menu": [],
+	"status": []
+}
